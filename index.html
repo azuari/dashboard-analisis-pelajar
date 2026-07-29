@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>IPSAS V2 | Integrated Pelajar Smart Analytics System</title>
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="style.css">
+
+    <!-- Chart.js (classic script - creates global `Chart`, still usable from ES modules) -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"/>
+
+    <!-- PapaParse (classic script - creates global `Papa`, required by js/data/parser.js) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+
+</head>
+
+<body>
+
+<!-- ===================================================== -->
+<!-- HEADER -->
+<!-- ===================================================== -->
+
+<header class="header">
+
+    <div class="logo">
+
+        <h1>IPSAS V2</h1>
+
+        <p>
+            Integrated Pelajar Smart Analytics System
+        </p>
+
+    </div>
+
+    <div class="header-right">
+
+        <div id="liveClock"></div>
+
+        <button id="refreshBtn">
+
+            <i class="fa-solid fa-rotate"></i>
+
+            Refresh Data
+
+        </button>
+
+    </div>
+
+</header>
+
+<!-- ===================================================== -->
+<!-- DASHBOARD -->
+<!-- ===================================================== -->
+
+<main class="container">
+
+<!-- ===================================================== -->
+<!-- CARD -->
+<!-- ===================================================== -->
+
+<section class="card-grid">
+
+<div class="card">
+
+<h3>
+
+<i class="fa-solid fa-users"></i>
+
+Jumlah Pelajar
+
+</h3>
+
+<h1 id="totalPelajar">
+
+0
+
+</h1>
+
+</div>
+
+<div class="card">
+
+<h3>
+
+<i class="fa-solid fa-calendar-check"></i>
+
+Purata Kehadiran
+
+</h3>
+
+<h1 id="avgAttendance">
+
+0%
+
+</h1>
+
+</div>
+
+<div class="card">
+
+<h3>
+
+<i class="fa-solid fa-graduation-cap"></i>
+
+Purata Markah
+
+</h3>
+
+<h1 id="avgMarks">
+
+0%
+
+</h1>
+
+</div>
+
+<div class="card">
+
+<h3>
+
+<i class="fa-solid fa-triangle-exclamation"></i>
+
+Pelajar Berisiko
+
+</h3>
+
+<h1 id="riskStudent">
+
+0
+
+</h1>
+
+</div>
+
+</section>
+
+<!-- ===================================================== -->
+<!-- CHART -->
+<!-- ===================================================== -->
+
+<section class="chart-grid">
+
+<div class="panel">
+
+<h2>
+
+Analisis Kehadiran Mengikut Kursus
+
+</h2>
+
+<canvas id="attendanceChart"></canvas>
+
+</div>
+
+<div class="panel">
+
+<h2>
+
+Analisis Markah Mengikut Kursus
+
+</h2>
+
+<canvas id="marksChart"></canvas>
+
+</div>
+
+</section>
+
+<!-- ===================================================== -->
+<!-- TABLE ATTENDANCE -->
+<!-- ===================================================== -->
+
+<section class="panel">
+
+<div class="panel-header">
+
+<h2>
+
+Jadual Kehadiran Pelajar
+
+</h2>
+
+<select id="attendanceCourse">
+
+<option>
+
+SMS
+
+</option>
+
+<option>
+
+SMV
+
+</option>
+
+<option>
+
+SMO
+
+</option>
+
+<option>
+
+SMB
+
+</option>
+
+</select>
+
+</div>
+
+<div class="table-wrapper">
+
+<table id="attendanceTable">
+
+</table>
+
+</div>
+
+</section>
+
+<!-- ===================================================== -->
+<!-- TABLE MARKS -->
+<!-- ===================================================== -->
+
+<section class="panel">
+
+<div class="panel-header">
+
+<h2>
+
+Jadual Pemarkahan Pelajar
+
+</h2>
+
+<select id="marksCourse">
+
+<option>
+
+SMS
+
+</option>
+
+<option>
+
+SMV
+
+</option>
+
+<option>
+
+SMO
+
+</option>
+
+<option>
+
+SMB
+
+</option>
+
+</select>
+
+</div>
+
+<div class="table-wrapper">
+
+<table id="marksTable">
+
+</table>
+
+</div>
+
+</section>
+
+<!-- ===================================================== -->
+<!-- STUDENT PROFILE -->
+<!-- ===================================================== -->
+
+<section class="panel">
+
+<h2>
+
+Profil Pelajar
+
+</h2>
+
+<div id="studentProfile">
+
+Klik nama pelajar untuk melihat maklumat.
+
+</div>
+
+</section>
+
+<!-- ===================================================== -->
+<!-- ANALYTICS -->
+<!-- ===================================================== -->
+
+<section class="analytics-grid">
+
+<div class="panel">
+
+<h2>
+
+Top 10 Kehadiran
+
+</h2>
+
+<div id="topAttendance">
+
+-
+
+</div>
+
+</div>
+
+<div class="panel">
+
+<h2>
+
+Top 10 Markah
+
+</h2>
+
+<div id="topMarks">
+
+-
+
+</div>
+
+</div>
+
+<div class="panel">
+
+<h2>
+
+Pelajar Berisiko
+
+</h2>
+
+<div id="riskList">
+
+-
+
+</div>
+
+</div>
+
+</section>
+
+<!-- ===================================================== -->
+<!-- AUDIT CENTER -->
+<!-- ===================================================== -->
+
+<section class="panel">
+
+<h2>
+
+Audit Center
+
+</h2>
+
+<div id="auditCenter">
+
+Loading...
+
+</div>
+
+</section>
+
+<!-- ===================================================== -->
+<!-- SYSTEM INFO -->
+<!-- ===================================================== -->
+
+<section class="panel">
+
+<h2>
+
+System Information
+
+</h2>
+
+<table class="systemTable">
+
+<tr>
+
+<td>Version</td>
+
+<td id="version">
+
+2.0.0
+
+</td>
+
+</tr>
+
+<tr>
+
+<td>Google Sheets</td>
+
+<td id="googleStatus">
+
+Checking...
+
+</td>
+
+</tr>
+
+<tr>
+
+<td>Attendance Engine</td>
+
+<td id="attendanceStatus">
+
+Checking...
+
+</td>
+
+</tr>
+
+<tr>
+
+<td>Marks Engine</td>
+
+<td id="marksStatus">
+
+Checking...
+
+</td>
+
+</tr>
+
+<tr>
+
+<td>Last Refresh</td>
+
+<td id="lastRefresh">
+
+-
+
+</td>
+
+</tr>
+
+</table>
+
+</section>
+
+</main>
+
+<!-- ===================================================== -->
+<!-- FOOTER -->
+<!-- ===================================================== -->
+
+<footer>
+
+<p>
+
+IPSAS V2
+
+Integrated Pelajar Smart Analytics System
+
+</p>
+
+<p>
+
+Institut Kemahiran Belia Negara Pekan
+
+</p>
+
+<p>
+
+Auditor :
+
+<b>
+
+ABU BAKAR BIN ADNAN
+
+(CPU Programming)
+
+</b>
+
+</p>
+
+</footer>
+
+<!-- ===================================================== -->
+<!-- APP (ES6 module - imports CONFIG internally, see js/app.js) -->
+<!-- Change Log: removed the separate classic <script src="config.js">
+     tag. config.js now uses `export const CONFIG`, which is a
+     SyntaxError in a classic (non-module) script. app.js imports
+     CONFIG directly instead. Path corrected: app.js/config.js live
+     under js/, not at the site root. -->
+<!-- ===================================================== -->
+
+<script type="module" src="js/app.js"></script>
+
+</body>
+
+</html>

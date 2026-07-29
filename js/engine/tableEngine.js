@@ -1,0 +1,1 @@
+table.pageSize = CONFIG.table.pageSize;
